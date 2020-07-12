@@ -1,6 +1,7 @@
 package com.wurmonline.womconverter.converters;
 
 import com.google.common.io.LittleEndianDataOutputStream;
+import com.wurmonline.womconverter.MatReporter;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
@@ -11,12 +12,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Properties;
 
 public class AssimpToWOMConverter {
 
     private static final String FLOATS_FORMAT = "%.4f";
 
-    public static void convert(File inputFile, File outputDirectory, boolean generateTangents) throws MalformedURLException, IOException {
+    public static void convert(File inputFile, File outputDirectory, boolean generateTangents, Properties forceMats, MatReporter matReport) throws MalformedURLException, IOException {
         if (inputFile == null || outputDirectory == null) {
             throw new IllegalArgumentException("Input file and/or output directory cannot be null");
         } else if (!outputDirectory.isDirectory()) {
@@ -59,7 +61,7 @@ public class AssimpToWOMConverter {
 
             int materialCount = 1;
             output.writeInt(materialCount);
-            writeMaterial(output, materials[meshes[i].mMaterialIndex()]);
+            writeMaterial(output, materials[meshes[i].mMaterialIndex()], forceMats, matReport);
         }
 
         int jointsCount = 0;
@@ -75,6 +77,8 @@ public class AssimpToWOMConverter {
         output.close();
 
         System.out.println("File converted: " + inputFile.getName() + ", output directory: " + outputDirectory.getAbsolutePath());
+
+        if (matReport != null) matReport.reportFile(inputFile.getName());
     }
 
     private static void writeMesh(LittleEndianDataOutputStream output, AIMesh mesh) throws IOException {
@@ -148,7 +152,7 @@ public class AssimpToWOMConverter {
         System.out.println("");
     }
 
-    private static void writeMaterial(LittleEndianDataOutputStream output, AIMaterial material) throws IOException {
+    private static void writeMaterial(LittleEndianDataOutputStream output, AIMaterial material, Properties forceMats, MatReporter matReport) throws IOException {
         AIString textureNameNative = AIString.create();
         Assimp.aiGetMaterialString(material, Assimp._AI_MATKEY_TEXTURE_BASE, Assimp.aiTextureType_DIFFUSE, 0, textureNameNative);
         String textureName = textureNameNative.dataString();
@@ -158,7 +162,12 @@ public class AssimpToWOMConverter {
         AIString materialNameNative = AIString.create();
         Assimp.aiGetMaterialString(material, Assimp.AI_MATKEY_NAME, 0, 0, materialNameNative);
         String materialName = materialNameNative.dataString();
+        if (forceMats.containsKey(textureName))
+            materialName = forceMats.getProperty(textureName);
         writeString(output, materialName);
+
+        if (matReport != null)
+            matReport.addMat(materialName, textureName);
 
         System.out.println("Material name:\t" + materialName);
         System.out.println("Texture path:\t" + textureName);
