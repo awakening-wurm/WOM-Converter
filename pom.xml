@@ -11,7 +11,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <name>WOM-Converter</name>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -23,8 +23,15 @@
             <artifactId>org.lwjgl.assimp</artifactId>
             <version>3.1.6</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>javaFX</artifactId>
+            <version>2.2</version>
+            <scope>system</scope>
+            <systemPath>/opt/steam/WurmServerLauncher/runtime/jre1.8.0_172/lib/ext/jfxrt.jar</systemPath>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -47,7 +54,7 @@
                     <execution>
                         <id>make-assembly</id>
                         <!-- bind to the packaging phase -->
-                        <phase>package</phase> 
+                        <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -56,5 +63,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
