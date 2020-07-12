@@ -1,17 +1,18 @@
 package com.wurmonline.womconverter;
 
-import java.io.File;
+import com.wurmonline.womconverter.converters.AssimpToWOMConverter;
 import javafx.application.Application;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import com.wurmonline.womconverter.converters.AssimpToWOMConverter;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class Main extends Application {
-    
+
     public static void main(String[] args) {
         if (args.length == 0 || (args.length == 1 && args[0].equalsIgnoreCase("-h"))) {
             System.out.println("Usage:");
@@ -30,15 +31,15 @@ public class Main extends Application {
 
             launch(args);
         }
-        
+
         boolean generateTangents = false;
         boolean recursive = false;
         String inputDirectory = "";
         String outputDirectory = "";
-        
+
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
-            
+
             switch (arg) {
                 case "-devfilechooser":
                     launch(args);
@@ -59,9 +60,9 @@ public class Main extends Application {
                     break;
             }
         }
-        
+
         String inputRegex = args[args.length - 1];
-        
+
         File inputDirectoryFile = new File(inputDirectory);
         if (!inputDirectoryFile.isDirectory()) {
             System.err.println("Input directory is not a valid directory: " + inputDirectory);
@@ -72,16 +73,16 @@ public class Main extends Application {
             System.err.println("Output directory is not a valid directory: " + outputDirectory);
             return;
         }
-        
+
         try {
             convertFiles(inputDirectoryFile, outputDirectoryFile, inputRegex, recursive, generateTangents);
         } catch (IOException ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         System.exit(0);
     }
-    
+
     private static void convertFiles(File inputDirectory, File outputDirectory, String inputRegex, boolean recursive, boolean generateTangents) throws IOException {
         File[] filteredFiles = inputDirectory.listFiles((File file) -> {
             if (file.isDirectory()) {
@@ -90,19 +91,19 @@ public class Main extends Application {
 
             return file.getName().matches(inputRegex);
         });
-        
+
         for (File file : filteredFiles) {
             AssimpToWOMConverter.convert(file, outputDirectory, generateTangents);
         }
-        
+
         if (recursive) {
             File[] directories = inputDirectory.listFiles((File file) -> {
                 return file.isDirectory();
             });
-            
+
             for (File directory : directories) {
                 String name = directory.getName();
-                
+
                 File newInputDirectory = directory;
                 File newOutputDirectory = new File(outputDirectory, name);
                 convertFiles(newInputDirectory, newOutputDirectory, inputRegex, recursive, generateTangents);
@@ -113,16 +114,16 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Collada Model");
-        
+
         File modelFile = fileChooser.showOpenDialog(primaryStage);
-        
+
         if (modelFile == null) {
             System.exit(0);
         }
-        
+
         AssimpToWOMConverter.convert(modelFile, modelFile.getParentFile(), true);
-        
+
         System.exit(0);
     }
-    
+
 }
