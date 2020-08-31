@@ -7,11 +7,11 @@
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <name>WOM-Converter</name>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -23,8 +23,20 @@
             <artifactId>org.lwjgl.assimp</artifactId>
             <version>3.1.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -47,7 +59,7 @@
                     <execution>
                         <id>make-assembly</id>
                         <!-- bind to the packaging phase -->
-                        <phase>package</phase> 
+                        <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -56,5 +68,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
